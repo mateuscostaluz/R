@@ -261,11 +261,98 @@ head(df)
 #/\ retorna 6 primeiras linhas
 tail(df)
 #/\ retorna 6 últimas linhas
-df[ ,2]
-df[2, ]
-df[2,2]
+df[ , 2]
+df[2,  ]
+df[2, 2]
 #/\ para selecionar o dataframe
 nrow(df)
 #/\ para saber quantidade de linhas
 ncol(df)
 #/\ para saber quantidade de colunas
+
+#\/ definindo diretório de trabalho
+setwd('D:/OneDrive - Fatec Centro Paula Souza/Documentos/Estudos/FIA/LAABD4/Introdução ao R/Aulas R/introducao_ao_R')
+
+#\/ carregando base de dados
+base.rh.csv = read.csv("Base RH.csv")
+#base.rh.csv = read.csv("Base RH.csv", sep = ";")
+#/\ sep = ";" <-- para definir o separador
+#para ver a base de dados usar o Enviroment do lado direito
+
+#para ler arquivo RDS (formato de arquivo do próprio R, objeto para salvar base de dados pelo R)
+base.rh.rds = readRDS("Base RH.RDS")
+
+#para ler arquivo xlsx (Excel)
+#instalar package openxlsx
+install.packages("openxlsx", dependencies = T)
+#usar package openxlsx
+library(openxlsx)
+#não usar package openxlsx
+detach("package:openxlsx", unload = TRUE)
+#ou usar lado inferior direito Packages e tickar ou destickar
+
+#para ler arquivo xlsx (Excel) --> definir a planilha dentro da pasta de trabalho Excel \/
+base.rh.xlsx = read.xlsx("Base RH.xlsx", sheet = "Base RH")
+
+#usar botão de expansão do lado superior direito para ver base de dados (colunas e tipos de valores)
+#ou usar função head para ver seis primeiras linhas da base de dados
+head(base.rh.csv)
+#ou usar função tail para ver seis últimas linhas da base de dados
+tail(base.rh.csv)
+
+#class mostra tipo de objeto
+class(base.rh.csv)
+class(base.rh.rds)
+class(base.rh.xlsx)
+
+#retorna medidas básicas de posição do data.frame
+summary(base.rh.csv)
+
+#min --> menor valor
+#primerio quartil --> 25%
+#mediana --> ponto central das linhas --> 50% | segundo quartil
+#/\ caso o total de linhas seja par, faz a media dos dois numeros centrais
+#media
+#terceiro quartil --> 75%
+#max --> maior valor
+
+#selecionar um tipo de valor na base de dados
+# ", " para pegar apenas linhas
+base.rh.feminino = base.rh.csv[base.rh.csv$Genero == "Feminino", ]
+summary(base.rh.feminino)
+#/\ subsetting da base
+
+#pacotes para saídas gráficas
+install.packages("dplyr")
+library(dplyr)
+install.packages("skimr")
+library(skimr)
+install.packages("ggplot2")
+library(ggplot2)
+
+#visualizar as medidas dos dados (saber o que se tem em mãos)
+skim(base.rh.csv)
+
+#fazer gráficos melhores visualmente (Plots lado inferior direito)
+ggplot(base.rh.csv)+
+  geom_histogram(mapping = aes(x = SalarioMensal))
+#/\ ver distribuição de valores
+# aes serve para dizer o que é o eixo X e o que é o eixo Y (aestetic)
+ggplot(base.rh.csv, mapping = aes(x = SalarioMensal, colour = Satisfacao))+
+  geom_freqpoly(binwidth = 1000)
+
+#transformar variável numérica em categórica
+base.rh.csv$Satisfacao = as.factor(base.rh.csv$Satisfacao)
+
+#count --> do pacote dplyr
+#conta quantidade por categoria e só funciona após converter variável para factor
+base.rh.csv %>%
+  count(Satisfacao)
+
+ggplot(base.rh.csv, mapping = aes(x = SalarioMensal,
+                                  y = Satisfacao))+
+  geom_boxplot()+
+  coord_flip()
+#/\ serve muito para mensurar se existe outlier (indícios) --> apresenta limites inferiores e superiores
+#outliers --> pontos fora da curva
+#coord_flip() --> transforma o gráfico de horizontal para vertical
